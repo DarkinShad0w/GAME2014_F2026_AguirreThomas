@@ -4,6 +4,6 @@ public class GameController : MonoBehaviour
 {
     private void Awake()
     {
-        Screen.orientation = ScreenOrientation.LandscapeLeft;
+        Screen.orientation = ScreenOrientation.Portrait;
     }
 }
