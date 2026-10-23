@@ -1,10 +1,18 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
 public class ObstacleSpawner : MonoBehaviour
 {
-    [SerializeField] private Obstacle obstaclePrefab;
+    [Serializable]
+    public class SpawnType
+    {
+        public LaneHazard prefab;
+        [Min(0f)] public float weight = 1f;
+    }
+
+    [SerializeField] private SpawnType[] types;
     [SerializeField] private Transform[] lanePoints;
 
     [Header("Positions")]
@@ -16,27 +24,46 @@ public class ObstacleSpawner : MonoBehaviour
     [SerializeField, Min(1)] private int minPerRow = 1;
     [SerializeField, Min(1)] private int maxPerRow = 2;
 
-    private ObjectPool<Obstacle> pool;
+    private ObjectPool<LaneHazard>[] pools;
+    private float totalWeight;
     private readonly List<int> laneBuffer = new List<int>();
     private float distanceSinceRow;
 
     private void Awake()
     {
-        pool = new ObjectPool<Obstacle>(
-            createFunc: CreateObstacle,
-            actionOnGet: o => o.gameObject.SetActive(true),
-            actionOnRelease: o => o.gameObject.SetActive(false),
-            actionOnDestroy: o => Destroy(o.gameObject),
-            collectionCheck: false,
-            defaultCapacity: 10,
-            maxSize: 40);
+        if (types == null)
+            return;
+
+        pools = new ObjectPool<LaneHazard>[types.Length];
+
+        for (int i = 0; i < types.Length; i++)
+        {
+            int index = i;
+            pools[i] = new ObjectPool<LaneHazard>(
+                createFunc: () => CreateHazard(index),
+                actionOnGet: h => h.gameObject.SetActive(true),
+                actionOnRelease: h => h.gameObject.SetActive(false),
+                actionOnDestroy: h => Destroy(h.gameObject),
+                collectionCheck: false,
+                defaultCapacity: 10,
+                maxSize: 30);
+        }
     }
 
-    void Start()
+    private void Start()
     {
-        if (obstaclePrefab == null || lanePoints == null || lanePoints.Length < 2)
+        if (!IsSetupValid())
         {
-            Debug.LogError("ObstacleSpawner: assign the obstacle prefab and at least 2 lane points.", this);
+            enabled = false;
+            return;
+        }
+
+        foreach (SpawnType t in types)
+            totalWeight += t.weight;
+
+        if (totalWeight <= 0f)
+        {
+            Debug.LogError("ObstacleSpawner: all weights are 0, so nothing could spawn.", this);
             enabled = false;
             return;
         }
@@ -44,7 +71,33 @@ public class ObstacleSpawner : MonoBehaviour
         distanceSinceRow = rowSpacing;
     }
 
-    void Update()
+    private bool IsSetupValid()
+    {
+        if (types == null || types.Length == 0)
+        {
+            Debug.LogError("ObstacleSpawner: add at least one entry to the Types list.", this);
+            return false;
+        }
+
+        foreach (SpawnType t in types)
+        {
+            if (t == null || t.prefab == null)
+            {
+                Debug.LogError("ObstacleSpawner: a Types entry has no prefab assigned.", this);
+                return false;
+            }
+        }
+
+        if (lanePoints == null || lanePoints.Length < 2)
+        {
+            Debug.LogError("ObstacleSpawner: assign at least 2 lane points.", this);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void Update()
     {
         distanceSinceRow += WorldSpeed.Current * Time.deltaTime;
 
@@ -60,8 +113,7 @@ public class ObstacleSpawner : MonoBehaviour
         int laneCount = lanePoints.Length;
         int maxAllowed = Mathf.Min(maxPerRow, laneCount - 1);
         int minAllowed = Mathf.Min(minPerRow, maxAllowed);
-        int count = Random.Range(minAllowed, maxAllowed + 1);
-
+        int count = UnityEngine.Random.Range(minAllowed, maxAllowed + 1);
         laneBuffer.Clear();
 
         for (int i = 0; i < laneCount; i++)
@@ -69,21 +121,37 @@ public class ObstacleSpawner : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            int j = Random.Range(i, laneCount);
+            int j = UnityEngine.Random.Range(i, laneCount);
             int lane = laneBuffer[j];
             laneBuffer[j] = laneBuffer[i];
             laneBuffer[i] = lane;
 
-            Obstacle o = pool.Get();
-            o.Launch(new Vector3(lanePoints[lane].position.x, y, 0f), despawnY);
+            int typeIndex = PickTypeIndex();
+            LaneHazard h = pools[typeIndex].Get();
+            h.Launch(new Vector3(lanePoints[lane].position.x, y, 0f), despawnY);
         }
     }
 
-    private Obstacle CreateObstacle()
+    private int PickTypeIndex()
     {
-        Obstacle o = Instantiate(obstaclePrefab, transform);
-        o.Setup(obstacle => pool.Release(obstacle));
-        return o;
+        float roll = UnityEngine.Random.value * totalWeight;
+
+        for (int i = 0; i < types.Length; i++)
+        {
+            roll -= types[i].weight;
+
+            if (roll <= 0f) 
+                return i;
+        }
+
+        return types.Length - 1;
+    }
+
+    private LaneHazard CreateHazard(int index)
+    {
+        LaneHazard h = Instantiate(types[index].prefab, transform);
+        h.Setup(hazard => pools[index].Release(hazard));
+        return h;
     }
 
     private void OnDrawGizmosSelected()
@@ -94,12 +162,16 @@ public class ObstacleSpawner : MonoBehaviour
         if (lanePoints != null && lanePoints.Length > 0 && lanePoints[0] != null)
         {
             left = right = lanePoints[0].position.x;
+
             foreach (Transform t in lanePoints)
             {
-                if (t == null) continue;
+                if (t == null)
+                    continue;
+
                 left = Mathf.Min(left, t.position.x);
                 right = Mathf.Max(right, t.position.x);
             }
+
             left -= 1.5f;
             right += 1.5f;
         }

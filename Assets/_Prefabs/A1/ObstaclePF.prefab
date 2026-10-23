@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 9182980903560101064}
   - component: {fileID: 5107465195830459145}
   - component: {fileID: 553106744183126246}
-  - component: {fileID: 982181985399727745}
+  - component: {fileID: 2827865861102917361}
   m_Layer: 0
   m_Name: ObstaclePF
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -167,7 +167,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &982181985399727745
+--- !u!114 &2827865861102917361
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -176,6 +176,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 8098263884210005610}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2af9900e8428fa4da436faec1c3f9e5, type: 3}
+  m_Script: {fileID: 11500000, guid: e0dbdd597c0e4944db363e1ca0c101dc, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Obstacle
+  m_EditorClassIdentifier: Assembly-CSharp::LaneHazard
