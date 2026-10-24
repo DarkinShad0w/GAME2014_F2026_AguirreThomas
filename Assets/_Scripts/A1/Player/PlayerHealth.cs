@@ -11,6 +11,7 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("Events")]
     public UnityEvent onDied;
+
     public event Action<int, int> HealthChanged;
     public event Action Died;
 
@@ -64,7 +65,7 @@ public class PlayerHealth : MonoBehaviour
 
         LaneHazard hazard = other.GetComponent<LaneHazard>();
 
-        if (hazard == null)
+        if (hazard == null || !hazard.DamagesPlayer)
             return;
 
         hazard.Despawn();
@@ -100,15 +101,6 @@ public class PlayerHealth : MonoBehaviour
         }
 
         invincibleTimer = invincibleDuration;
-    }
-
-    public void Heal(int amount = 1)
-    {
-        if (isDead || amount <= 0)
-            return;
-
-        currentHearts = Mathf.Min(maxHearts, currentHearts + amount);
-        HealthChanged?.Invoke(currentHearts, maxHearts);
     }
 
     private void SetAlpha(float a)

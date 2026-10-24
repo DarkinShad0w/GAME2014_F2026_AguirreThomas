@@ -22,6 +22,8 @@ public class LaneHazard : MonoBehaviour
 
     protected virtual void OnLaunch() { }
 
+    public virtual bool DamagesPlayer => true;
+
     protected virtual void Update()
     {
         Vector3 p = transform.position;

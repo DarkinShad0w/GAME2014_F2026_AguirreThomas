@@ -6,7 +6,6 @@ public class LaneController : MonoBehaviour
     [SerializeField] private Transform[] lanePoints;
     [SerializeField] private int startLane = 1;
     [SerializeField] private float moveDuration = 0.1f;
-    [SerializeField] private bool keyboardControls = true;
 
     private int currentLane;
     private bool isMoving;
@@ -33,9 +32,6 @@ public class LaneController : MonoBehaviour
 
     void Update()
     {
-        if (keyboardControls) 
-            ReadKeyboard();
-
         if (!isMoving) 
             return;
 
@@ -93,17 +89,5 @@ public class LaneController : MonoBehaviour
         transform.position = p;
     }
 
-    private void ReadKeyboard()
-    {
-        Keyboard kb = Keyboard.current;
-
-        if (kb == null) 
-            return;
-
-        if (kb.leftArrowKey.wasPressedThisFrame || kb.aKey.wasPressedThisFrame)
-            MoveLeft();
-
-        if (kb.rightArrowKey.wasPressedThisFrame || kb.dKey.wasPressedThisFrame) 
-            MoveRight();
-    }
+    
 }

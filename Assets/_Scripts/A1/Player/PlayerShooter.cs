@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.Pool;
-using UnityEngine.UI;
+using System;
 
 public class PlayerShooter : MonoBehaviour
 {
@@ -11,15 +11,16 @@ public class PlayerShooter : MonoBehaviour
 
     [Header("Shooting")]
     [SerializeField, Min(0.05f)] private float cooldown = 0.25f;
-    [SerializeField, Min(0.1f)] private float bulletSpeed = 12f;
+    [SerializeField, Min(0.1f)] private float bulletSpeed = 6f;
     [SerializeField] private float despawnY = 7f;
 
+    public event Action Fired;
     private ObjectPool<Bullet> pool;
     private float nextShotTime;
 
     private void Awake()
     {
-        if (playerHealth == null)
+        if (playerHealth == null) 
             playerHealth = GetComponent<PlayerHealth>();
 
         pool = new ObjectPool<Bullet>(
@@ -57,6 +58,8 @@ public class PlayerShooter : MonoBehaviour
 
         Bullet b = pool.Get();
         b.Launch(origin, bulletSpeed, despawnY);
+
+        Fired?.Invoke();
     }
 
     private Bullet CreateBullet()

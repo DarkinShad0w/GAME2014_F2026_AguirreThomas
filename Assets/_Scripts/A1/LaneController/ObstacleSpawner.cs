@@ -24,6 +24,11 @@ public class ObstacleSpawner : MonoBehaviour
     [SerializeField, Min(1)] private int minPerRow = 1;
     [SerializeField, Min(1)] private int maxPerRow = 2;
 
+    [Header("Coins (optional)")]
+    [SerializeField] private Coin coinPrefab;
+    [SerializeField, Range(0f, 1f)] private float coinChance = 0.5f;
+
+    private ObjectPool<LaneHazard> coinPool;
     private ObjectPool<LaneHazard>[] pools;
     private float totalWeight;
     private readonly List<int> laneBuffer = new List<int>();
@@ -38,9 +43,21 @@ public class ObstacleSpawner : MonoBehaviour
 
         for (int i = 0; i < types.Length; i++)
         {
-            int index = i;
+            int index = i; // captured by the lambdas below
             pools[i] = new ObjectPool<LaneHazard>(
                 createFunc: () => CreateHazard(index),
+                actionOnGet: h => h.gameObject.SetActive(true),
+                actionOnRelease: h => h.gameObject.SetActive(false),
+                actionOnDestroy: h => Destroy(h.gameObject),
+                collectionCheck: false,
+                defaultCapacity: 10,
+                maxSize: 30);
+        }
+
+        if (coinPrefab != null)
+        {
+            coinPool = new ObjectPool<LaneHazard>(
+                createFunc: CreateCoin,
                 actionOnGet: h => h.gameObject.SetActive(true),
                 actionOnRelease: h => h.gameObject.SetActive(false),
                 actionOnDestroy: h => Destroy(h.gameObject),
@@ -114,9 +131,10 @@ public class ObstacleSpawner : MonoBehaviour
         int maxAllowed = Mathf.Min(maxPerRow, laneCount - 1);
         int minAllowed = Mathf.Min(minPerRow, maxAllowed);
         int count = UnityEngine.Random.Range(minAllowed, maxAllowed + 1);
+
         laneBuffer.Clear();
 
-        for (int i = 0; i < laneCount; i++)
+        for (int i = 0; i < laneCount; i++) 
             laneBuffer.Add(i);
 
         for (int i = 0; i < count; i++)
@@ -130,6 +148,13 @@ public class ObstacleSpawner : MonoBehaviour
             LaneHazard h = pools[typeIndex].Get();
             h.Launch(new Vector3(lanePoints[lane].position.x, y, 0f), despawnY);
         }
+
+        if (coinPool != null && count < laneCount && UnityEngine.Random.value < coinChance)
+        {
+            int freeLane = laneBuffer[UnityEngine.Random.Range(count, laneCount)];
+            LaneHazard coin = coinPool.Get();
+            coin.Launch(new Vector3(lanePoints[freeLane].position.x, y, 0f), despawnY);
+        }
     }
 
     private int PickTypeIndex()
@@ -140,11 +165,18 @@ public class ObstacleSpawner : MonoBehaviour
         {
             roll -= types[i].weight;
 
-            if (roll <= 0f) 
+            if (roll <= 0f)
                 return i;
         }
 
         return types.Length - 1;
+    }
+
+    private LaneHazard CreateCoin()
+    {
+        LaneHazard c = Instantiate(coinPrefab, transform);
+        c.Setup(coin => coinPool.Release(coin));
+        return c;
     }
 
     private LaneHazard CreateHazard(int index)

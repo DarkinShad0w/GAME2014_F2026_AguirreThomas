@@ -1,11 +1,14 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class BackButtonBehavior : MonoBehaviour
 {
     public void OnBackButtonPressed()
     {
-        Debug.Log("Back Button Pressed");
-        SceneManager.LoadScene("Start");
+        MenuSoundManager.Instance.PlayClickAndLoad("Start");
+    }
+
+    public void OnBackButtonPressedGame()
+    {
+        GameSoundManager.Instance.PlayClickAndLoad("Start");
     }
 }

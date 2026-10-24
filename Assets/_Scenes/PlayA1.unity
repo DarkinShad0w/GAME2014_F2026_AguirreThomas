@@ -284,6 +284,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameController
   playerHealth: {fileID: 1942183486}
   gameOverPanel: {fileID: 1894518731}
+  coinCollector: {fileID: 1942183490}
+  finalScoreLabel: {fileID: 1167052777}
+  finalScoreFormat: 'Score: {0}'
 --- !u!4 &24759643
 Transform:
   m_ObjectHideFlags: 0
@@ -1136,6 +1139,69 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &524308392
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 524308394}
+  - component: {fileID: 524308393}
+  m_Layer: 0
+  m_Name: Sound Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &524308393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524308392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f298dd2e1559b1746a3fe580c66e9951, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameSoundManager
+  playerHealth: {fileID: 1942183486}
+  playerShooter: {fileID: 1942183489}
+  coinCollector: {fileID: 1942183490}
+  musicClip: {fileID: 8300000, guid: c769232567324bf4995f5bff27e5e7b0, type: 3}
+  musicVolume: 0.5
+  gameOverMusicClip: {fileID: 8300000, guid: c769232567324bf4995f5bff27e5e7b0, type: 3}
+  shootClip: {fileID: 8300000, guid: 23c69a2635e5a9042bf663dfab7e6003, type: 3}
+  shootVolume: 0.6
+  playerHitClip: {fileID: 8300000, guid: 5c6d8e8698dbfd046b7d22cc7504d097, type: 3}
+  playerHitVolume: 1
+  playerDeathClip: {fileID: 8300000, guid: 3de1b6bf59751bb4eaf188c199af2c1d, type: 3}
+  playerDeathVolume: 1
+  enemyDeathClip: {fileID: 8300000, guid: 0269de6a878ceb949a953e30981d963a, type: 3}
+  enemyDeathVolume: 0.8
+  coinClip: {fileID: 8300000, guid: 7421722acce573042b0b0fd1455a4f0e, type: 3}
+  coinVolume: 0.8
+  clickClip: {fileID: 8300000, guid: 832a4670fa82ec34a9a8b02d99a3a607, type: 3}
+  clickVolume: 1
+  maxLoadDelay: 1
+--- !u!4 &524308394
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 524308392}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 69.62637, y: 1169.9828, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &571989715
 GameObject:
   m_ObjectHideFlags: 0
@@ -1925,7 +1991,6 @@ GameObject:
   - component: {fileID: 810780644}
   - component: {fileID: 810780643}
   - component: {fileID: 810780642}
-  - component: {fileID: 810780645}
   m_Layer: 5
   m_Name: Restart Button
   m_TagString: Untagged
@@ -2047,18 +2112,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 810780640}
   m_CullTransparentMesh: 1
---- !u!114 &810780645
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 810780640}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37f9630075252c940b9f7a476bad7c3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BackButtonBehavior
 --- !u!1 &896586910
 GameObject:
   m_ObjectHideFlags: 0
@@ -2846,6 +2899,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1316984654}
   - component: {fileID: 1316984655}
+  - component: {fileID: 1316984656}
   m_Layer: 5
   m_Name: Hearts
   m_TagString: Untagged
@@ -2868,6 +2922,7 @@ RectTransform:
   - {fileID: 263778182}
   - {fileID: 227857176}
   - {fileID: 896586911}
+  - {fileID: 1949271995}
   m_Father: {fileID: 1122061542}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
@@ -2894,6 +2949,21 @@ MonoBehaviour:
   - {fileID: 263778183}
   fullSprite: {fileID: 21300000, guid: c54c2c500306b2b45b844341e1a8412e, type: 3}
   emptySprite: {fileID: 21300000, guid: 6181edc2626d9eb4da39f62386531c6b, type: 3}
+--- !u!114 &1316984656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1316984653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 468f21262c046ce4e82208a52b37dce7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CoinsDisplay
+  coinCollector: {fileID: 1942183490}
+  label: {fileID: 1949271996}
+  format: 'Points: {0}'
 --- !u!1 &1411635482
 GameObject:
   m_ObjectHideFlags: 0
@@ -3419,6 +3489,8 @@ MonoBehaviour:
   rowSpacing: 5
   minPerRow: 1
   maxPerRow: 3
+  coinPrefab: {fileID: 2433718608913012338, guid: 1dae28631a6109b44aa63f234ec1e3be, type: 3}
+  coinChance: 1
 --- !u!4 &1698795647
 Transform:
   m_ObjectHideFlags: 0
@@ -3588,6 +3660,7 @@ GameObject:
   - component: {fileID: 1942183484}
   - component: {fileID: 1942183486}
   - component: {fileID: 1942183489}
+  - component: {fileID: 1942183490}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -3613,7 +3686,6 @@ MonoBehaviour:
   - {fileID: 1121022272}
   startLane: 1
   moveDuration: 0.1
-  keyboardControls: 1
 --- !u!4 &1942183485
 Transform:
   m_ObjectHideFlags: 0
@@ -3739,8 +3811,160 @@ MonoBehaviour:
   firePoint: {fileID: 177236035}
   playerHealth: {fileID: 1942183486}
   cooldown: 0.25
-  bulletSpeed: 12
+  bulletSpeed: 6
   despawnY: 4.6
+--- !u!114 &1942183490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1942183483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6569d7bf1ff4cd94e97bb4d66fa7afed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CoinCollector
+  playerHealth: {fileID: 1942183486}
+--- !u!1 &1949271994
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1949271995}
+  - component: {fileID: 1949271997}
+  - component: {fileID: 1949271996}
+  m_Layer: 5
+  m_Name: Coins
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1949271995
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1949271994}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1316984654}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -167, y: -223}
+  m_SizeDelta: {x: 544.3, y: 155.1}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1949271996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1949271994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: 'Coins: 00
+
+'
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 95.9
+  m_fontSizeBase: 95.9
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 1
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1949271997
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1949271994}
+  m_CullTransparentMesh: 1
 --- !u!1 &2039386813
 GameObject:
   m_ObjectHideFlags: 0
@@ -3924,6 +4148,7 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 24759643}
+  - {fileID: 524308394}
   - {fileID: 1698795647}
   - {fileID: 1122061542}
   - {fileID: 776655594}
