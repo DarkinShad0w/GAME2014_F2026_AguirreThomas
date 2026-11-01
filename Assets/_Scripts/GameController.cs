@@ -27,27 +27,6 @@ public class GameController : MonoBehaviour
         Screen.orientation = ScreenOrientation.LandscapeLeft;
     }
 
-    private void OnEnable()
-    {
-        if (playerHealth != null) playerHealth.Died += GameOver;
-    }
-
-    private void OnDisable()
-    {
-        if (playerHealth != null) playerHealth.Died -= GameOver;
-    }
-
-    private void GameOver()
-    {
-        WorldSpeed.Current = 0f;
-
-        if (finalScoreLabel != null && coinCollector != null)
-            finalScoreLabel.text = string.Format(finalScoreFormat, coinCollector.Coins);
-
-        if (gameOverPanel != null)
-            gameOverPanel.SetActive(true);
-    }
-
     public void Restart()
     {
         string scene = SceneManager.GetActiveScene().name;

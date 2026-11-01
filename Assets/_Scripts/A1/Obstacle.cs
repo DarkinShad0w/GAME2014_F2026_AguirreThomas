@@ -22,7 +22,6 @@ public class Obstacle : MonoBehaviour
     void Update()
     {
         Vector3 p = transform.position;
-        p.y -= WorldSpeed.Current * Time.deltaTime;
         transform.position = p;
 
         if (p.y < despawnY)

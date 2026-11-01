@@ -3,62 +3,38 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField, Min(1)] private int damage = 1;
-
-    private Action<Bullet> releaseToPool;
+    private Action<Bullet> release;
     private float speed;
-    private float despawnY;
-    private bool inPlay;
+    private float despawnX;
+    private bool released = true;
 
-    public void Setup(Action<Bullet> release)
+    public void Setup(Action<Bullet> releaseCallback)
     {
-        releaseToPool = release;
+        release = releaseCallback;
     }
 
-    public void Launch(Vector3 position, float bulletSpeed, float despawnAboveY)
+    public void Launch(Vector3 origin, float bulletSpeed, float despawnAtX)
     {
-        transform.position = position;
+        transform.position = origin;
         speed = bulletSpeed;
-        despawnY = despawnAboveY;
-        inPlay = true;
+        despawnX = despawnAtX;
+        released = false;
     }
 
     private void Update()
     {
-        Vector3 p = transform.position;
-        p.y += speed * Time.deltaTime;
-        transform.position = p;
+        transform.position += Vector3.right * speed * Time.deltaTime;
 
-        if (p.y > despawnY)
-            Despawn();
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (!inPlay) return;
-
-        Enemy enemy = other.GetComponent<Enemy>();
-        if (enemy != null)
-        {
-            enemy.TakeHit(damage);
-            Despawn();
-            return;
-        }
-
-        if (other.CompareTag("Obstacle"))
+        if (transform.position.x >= despawnX)
             Despawn();
     }
 
     public void Despawn()
     {
-        if (!inPlay)
+        if (released)
             return;
 
-        inPlay = false;
-
-        if (releaseToPool != null)
-            releaseToPool(this);
-        else
-            Destroy(gameObject);
+        released = true;
+        release?.Invoke(this);
     }
 }

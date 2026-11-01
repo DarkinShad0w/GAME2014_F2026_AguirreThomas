@@ -17,30 +17,31 @@ public class PlayerShooter : MonoBehaviour
 
     public event Action Fired;
     private ObjectPool<Bullet> pool;
+    private BulletFactory factory;
     private float nextShotTime;
 
     private void Awake()
     {
-        if (playerHealth == null) 
+        if (playerHealth == null)
             playerHealth = GetComponent<PlayerHealth>();
 
+        if (bulletPrefab == null)
+        {
+            Debug.LogError("PlayerShooter: assign the bullet prefab in the Inspector.", this);
+            enabled = false;
+            return;
+        }
+
+        factory = new BulletFactory(bulletPrefab, b => pool.Release(b));
+
         pool = new ObjectPool<Bullet>(
-            createFunc: CreateBullet,
+            createFunc: factory.Create,
             actionOnGet: b => b.gameObject.SetActive(true),
             actionOnRelease: b => b.gameObject.SetActive(false),
             actionOnDestroy: b => Destroy(b.gameObject),
             collectionCheck: false,
             defaultCapacity: 20,
             maxSize: 60);
-    }
-
-    private void Start()
-    {
-        if (bulletPrefab == null)
-        {
-            Debug.LogError("PlayerShooter: assign the bullet prefab in the Inspector.", this);
-            enabled = false;
-        }
     }
 
     public void Shoot()
@@ -64,10 +65,21 @@ public class PlayerShooter : MonoBehaviour
         Fired?.Invoke();
     }
 
-    private Bullet CreateBullet()
+    private void OnDrawGizmos()
     {
-        Bullet b = Instantiate(bulletPrefab);
-        b.Setup(bullet => pool.Release(bullet));
-        return b;
+        float halfHeight = 4f;
+        float centerY = transform.position.y;
+
+        Camera cam = Camera.main;
+        if (cam != null)
+        {
+            halfHeight = cam.orthographicSize + 0.5f;
+            centerY = cam.transform.position.y;
+        }
+
+        // Vertical line showing where bullets despawn on the X axis.
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(new Vector3(despawnX, centerY - halfHeight, 0f),
+                        new Vector3(despawnX, centerY + halfHeight, 0f));
     }
 }
