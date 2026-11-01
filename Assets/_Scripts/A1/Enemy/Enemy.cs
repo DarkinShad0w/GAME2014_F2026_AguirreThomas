@@ -10,6 +10,7 @@ public class Enemy : MonoBehaviour
     [SerializeField, Min(0.01f)] private float flashDuration = 0.08f;
 
     public static event Action<int> Killed;
+
     private int hp;
     private bool dead;
     private Color normalColor;
@@ -21,7 +22,10 @@ public class Enemy : MonoBehaviour
             sprite = GetComponent<SpriteRenderer>();
         if (sprite != null)
             normalColor = sprite.color;
+    }
 
+    private void OnEnable()
+    {
         hp = maxHp;
         dead = false;
         flashTimer = 0f;
@@ -41,6 +45,18 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (dead)
+            return;
+
+        if (collision.TryGetComponent(out Bullet bullet))
+        {
+            TakeHit(1);
+            bullet.Despawn();
+        }
+    }
+
     public void TakeHit(int damage = 1)
     {
         if (dead)
@@ -52,7 +68,7 @@ public class Enemy : MonoBehaviour
         {
             dead = true;
             Killed?.Invoke(points);
-            Destroy(gameObject);
+            gameObject.SetActive(false);
             return;
         }
 

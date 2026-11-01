@@ -3,22 +3,32 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
+
 public class GameController : MonoBehaviour
 {
+    [System.Serializable]
+    private class Spawnable
+    {
+        public GameObject prefab;
+        public int poolSize = 5;
+        public float weight = 1f;
+        public Transform spawnPoint;
+        [System.NonSerialized] public List<GameObject> pool = new List<GameObject>();
+    }
+
     [SerializeField] private PlayerHealth playerHealth;
 
     [Header("Scrolling")]
     [SerializeField] private BackgroundScroller background;
 
     [Header("Spawning")]
-    [SerializeField] private GameObject obstaclePrefab;
     [SerializeField] private Transform spawnPoint;
-    [SerializeField] private int poolSize = 5;
+    [SerializeField] private Spawnable[] spawnables;
     [SerializeField] private float minSpawnInterval = 1f;
     [SerializeField] private float maxSpawnInterval = 3f;
     [SerializeField] private float despawnX = -15f;
 
-    private readonly List<GameObject> pool = new List<GameObject>();
     private float timer;
     private float nextSpawn;
 
@@ -27,23 +37,19 @@ public class GameController : MonoBehaviour
         Screen.orientation = ScreenOrientation.LandscapeLeft;
     }
 
-    public void Restart()
-    {
-        string scene = SceneManager.GetActiveScene().name;
-
-        if (GameSoundManager.Instance != null)
-            GameSoundManager.Instance.PlayClickAndLoad("PlayA1");
-        else
-            SceneManager.LoadScene(scene);
-    }
-
     private void Start()
     {
-        for (int i = 0; i < poolSize; i++)
+        foreach(Spawnable s in spawnables)
         {
-            GameObject obj = Instantiate(obstaclePrefab);
-            obj.SetActive(false);
-            pool.Add(obj);
+            if (s.prefab == null)
+                continue;
+
+            for (int i = 0; i < s.poolSize; i++)
+            {
+                GameObject obj = Instantiate(s.prefab);
+                obj.SetActive(false);
+                s.pool.Add(obj);
+            }
         }
 
         nextSpawn = Random.Range(minSpawnInterval, maxSpawnInterval);
@@ -53,15 +59,18 @@ public class GameController : MonoBehaviour
     {
         Vector3 move = Vector3.left * background.speed * Time.deltaTime;
 
-        foreach (GameObject obj in pool)
+        foreach (Spawnable s in spawnables)
         {
-            if (!obj.activeInHierarchy)
-                continue;
+            foreach (GameObject obj in s.pool)
+            {
+                if (!obj.activeInHierarchy)
+                    continue;
 
-            obj.transform.position += move;
+                obj.transform.position += move;
 
-            if (obj.transform.position.x <= despawnX)
-                obj.SetActive(false);
+                if (obj.transform.position.x <= despawnX)
+                    obj.SetActive(false);
+            }
         }
 
         timer += Time.deltaTime;
@@ -74,16 +83,66 @@ public class GameController : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        if (playerHealth != null)
+            playerHealth.Died += OnPlayerDied;
+    }
+
+    private void OnDisable()
+    {
+        if (playerHealth != null)
+            playerHealth.Died -= OnPlayerDied;
+    }
+
     private void Spawn()
     {
-        foreach (GameObject obj in pool)
+        Spawnable chosen = PickWeighted();
+        if (chosen == null)
+            return;
+
+        foreach (GameObject obj in chosen.pool)
         {
             if (!obj.activeInHierarchy)
             {
-                obj.transform.position = spawnPoint.position;
+                Transform point = chosen.spawnPoint != null ? chosen.spawnPoint : spawnPoint;
+                obj.transform.position = point.position;
                 obj.SetActive(true);
                 return;
             }
         }
+    }
+
+    private Spawnable PickWeighted()
+    {
+        float total = 0f;
+
+        foreach (Spawnable s in spawnables)
+        {
+            if (s.prefab != null)
+                total += s.weight;
+        }
+
+        if (total <= 0f)
+            return null;
+
+        float roll = Random.value * total;
+
+        foreach (Spawnable s in spawnables)
+        {
+            if (s.prefab == null)
+                continue;
+
+            roll -= s.weight;
+            if (roll <= 0f)
+                return s;
+        }
+
+        return null;
+    }
+
+    private void OnPlayerDied()
+    {
+        SceneManager.LoadScene("End");
     }
 }
