@@ -4,23 +4,11 @@ using UnityEngine;
 public class BackgroundScroller : MonoBehaviour
 {
     [Header("Scrolling")]
-    [SerializeField] private float speed = 2f;
-
-    [Header("Spawning")]
-    [SerializeField] private GameObject obstaclePrefab;
-    [SerializeField] private Transform spawnPoint;
-    [SerializeField] private int poolSize = 5;
-    [SerializeField] private float minSpawnInterval = 1f;
-    [SerializeField] private float maxSpawnInterval = 3f;
-    [SerializeField] private float despawnX = -15f;
+    [SerializeField] public float speed = 2f;
 
     private Transform copy;
     private float width;
     private float startX;
-
-    private readonly List<GameObject> pool = new List<GameObject>();
-    private float timer;
-    private float nextSpawn;
 
     void Start()
     {
@@ -33,15 +21,6 @@ public class BackgroundScroller : MonoBehaviour
 
         Destroy(clone.GetComponent<BackgroundScroller>());
         copy = clone.transform;
-
-        for (int i = 0; i < poolSize; i++)
-        {
-            GameObject obj = Instantiate(obstaclePrefab);
-            obj.SetActive(false);
-            pool.Add(obj);
-        }
-
-        nextSpawn = Random.Range(minSpawnInterval, maxSpawnInterval);
     }
 
     void Update()
@@ -55,37 +34,5 @@ public class BackgroundScroller : MonoBehaviour
 
         if (copy.position.x <= startX - width) 
             copy.position += Vector3.right * width * 2f;
-
-        foreach (GameObject obj in pool)
-        {
-            if (!obj.activeInHierarchy) 
-                continue;
-            obj.transform.position += move;
-
-            if (obj.transform.position.x <= despawnX) 
-                obj.SetActive(false);
-        }
-
-        timer += Time.deltaTime;
-
-        if (timer >= nextSpawn)
-        {
-            timer = 0f;
-            nextSpawn = Random.Range(minSpawnInterval, maxSpawnInterval);
-            Spawn();
-        }
-    }
-
-    private void Spawn()
-    {
-        foreach (GameObject obj in pool)
-        {
-            if (!obj.activeInHierarchy)
-            {
-                obj.transform.position = spawnPoint.position;
-                obj.SetActive(true);
-                return;
-            }
-        }
     }
 }

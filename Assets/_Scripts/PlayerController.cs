@@ -15,36 +15,18 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    private void Update()
+    public void Jump()
     {
-        if (jumpsLeft > 0 && TouchBegan())
-        {
-            ResetVerticalSpeed();
-            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-            jumpsLeft--;
-        }
+        if (jumpsLeft <= 0)
+            return;
+
+        rb.linearVelocity = new Vector2(rb.linearVelocityX, 0f);
+        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        jumpsLeft--;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         jumpsLeft = maxJumps;
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        SceneManager.LoadScene("End");
-    }
-
-    private void ResetVerticalSpeed()
-    {
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
-    }
-
-    private bool TouchBegan()
-    {
-        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
-            return true;
-
-        return Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
     }
 }
