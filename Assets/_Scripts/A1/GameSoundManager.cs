@@ -9,7 +9,8 @@ public class GameSoundManager : MonoBehaviour
     [Header("Listens to")]
     [SerializeField] private PlayerHealth playerHealth;
     [SerializeField] private PlayerShooter playerShooter;
-    //[SerializeField] private CoinCollector coinCollector;
+    [SerializeField] private CoinCollector coinCollector;
+
 
     [Header("Music")]
     [SerializeField] private AudioClip musicClip;
@@ -64,8 +65,8 @@ public class GameSoundManager : MonoBehaviour
         if (playerShooter != null)
             playerShooter.Fired += OnShot;
 
-    //    if (coinCollector != null)
-    //        coinCollector.CoinCollected += OnCoinCollected;
+        if (coinCollector != null)
+            coinCollector.CoinCollected += OnCoinCollected;
 
         Enemy.Killed += OnEnemyKilled;
     }
@@ -80,9 +81,9 @@ public class GameSoundManager : MonoBehaviour
 
         if (playerShooter != null)
             playerShooter.Fired -= OnShot;
-
-    //    if (coinCollector != null)
-    //       coinCollector.CoinCollected -= OnCoinCollected;
+            
+        if (coinCollector != null)
+            coinCollector.CoinCollected -= OnCoinCollected;
 
         Enemy.Killed -= OnEnemyKilled;
     }

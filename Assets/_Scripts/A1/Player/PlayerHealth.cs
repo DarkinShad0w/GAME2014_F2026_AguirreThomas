@@ -69,11 +69,13 @@ public class PlayerHealth : MonoBehaviour
     }
 
     public void TakeHit(int damage)
+
     {
         if (isDead || IsInvincible)
             return;
 
         currentHearts = Mathf.Max(0, currentHearts - damage);
+
         HealthChanged?.Invoke(currentHearts, maxHearts);
 
         if (currentHearts == 0)

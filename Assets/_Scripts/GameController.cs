@@ -1,17 +1,10 @@
-<<<<<<< Updated upstream
-=======
 using System.Collections.Generic;
 using TMPro;
->>>>>>> Stashed changes
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
-<<<<<<< Updated upstream
-    private void Awake()
-    {
-        Screen.orientation = ScreenOrientation.LandscapeLeft;
-=======
     [SerializeField] private PlayerHealth playerHealth;
 
     [Header("Scrolling")]
@@ -32,6 +25,37 @@ public class GameController : MonoBehaviour
     private void Awake()
     {
         Screen.orientation = ScreenOrientation.LandscapeLeft;
+    }
+
+    private void OnEnable()
+    {
+        if (playerHealth != null) playerHealth.Died += GameOver;
+    }
+
+    private void OnDisable()
+    {
+        if (playerHealth != null) playerHealth.Died -= GameOver;
+    }
+
+    private void GameOver()
+    {
+        WorldSpeed.Current = 0f;
+
+        if (finalScoreLabel != null && coinCollector != null)
+            finalScoreLabel.text = string.Format(finalScoreFormat, coinCollector.Coins);
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+    }
+
+    public void Restart()
+    {
+        string scene = SceneManager.GetActiveScene().name;
+
+        if (GameSoundManager.Instance != null)
+            GameSoundManager.Instance.PlayClickAndLoad("PlayA1");
+        else
+            SceneManager.LoadScene(scene);
     }
 
     private void Start()
@@ -82,6 +106,5 @@ public class GameController : MonoBehaviour
                 return;
             }
         }
->>>>>>> Stashed changes
     }
 }

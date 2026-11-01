@@ -14,6 +14,7 @@ public class PlayerShooter : MonoBehaviour
     [SerializeField, Min(0.1f)] private float bulletSpeed = 6f;
     [SerializeField] private float despawnX = 7f;
 
+
     public event Action Fired;
     private ObjectPool<Bullet> pool;
     private float nextShotTime;
@@ -58,6 +59,7 @@ public class PlayerShooter : MonoBehaviour
 
         Bullet b = pool.Get();
         b.Launch(origin, bulletSpeed, despawnX);
+
 
         Fired?.Invoke();
     }
