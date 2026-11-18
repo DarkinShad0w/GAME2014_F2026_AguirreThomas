@@ -1,32 +1,34 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float jumpForce = 8f;
-    [SerializeField] private int maxJumps = 2;
+    [SerializeField] private JoystickController joystick;
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField, Range(0f, 1f)] private float deadZone = 0.1f;
+    [SerializeField] private bool flipSprite = true;
 
     private Rigidbody2D rb;
-    private int jumpsLeft;
+    private SpriteRenderer spriteRenderer;
+    private float moveInput;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    public void Jump()
+    private void Update()
     {
-        if (jumpsLeft <= 0)
-            return;
+        float x = joystick != null ? joystick.Horizontal : 0f;
+        moveInput = Mathf.Abs(x) < deadZone ? 0f : x;
 
-        rb.linearVelocity = new Vector2(rb.linearVelocityX, 0f);
-        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-        jumpsLeft--;
+        if (flipSprite && spriteRenderer != null && moveInput != 0f)
+            spriteRenderer.flipX = moveInput < 0f;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void FixedUpdate()
     {
-        jumpsLeft = maxJumps;
+        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocityY);
     }
 }
