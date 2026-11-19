@@ -9,8 +9,8 @@ public class BackButtonBehavior : MonoBehaviour
         SceneManager.LoadScene("Start");
     }
 
-    public void OnBackButtonPressedGame()
+/*    public void OnBackButtonPressedGame()
     {
         GameSoundManager.Instance.PlayClickAndLoad("Start");
-    }
+    }*/
 }
